@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { createFileRoute } from '@tanstack/react-router'
 import {
   getCoreRowModel,
@@ -14,12 +15,14 @@ import { GlobalSearch } from './-components/global-search'
 import { FilterBar } from './-components/filter-bar'
 import { ActiveFilters } from './-components/active-filters'
 import { DataTable } from './-components/data-table'
+import { VirtualDataTable } from './-components/virtual-data-table'
 
 export const Route = createFileRoute('/spike/table/')({
   component: RouteComponent,
 })
 
 function RouteComponent() {
+  const [useVirtualization, setUseVirtualization] = useState(true)
   const { data, loading } = useStockData()
   const filters = useTableFilters(data)
 
@@ -50,13 +53,32 @@ function RouteComponent() {
   return (
     <div className="min-h-screen bg-gray-900 p-6">
       <div className="mx-auto max-w-6xl">
-        <h1 className="mb-2 text-2xl font-bold text-white">
-          Trading Surveillance
-        </h1>
-        <p className="mb-4 text-sm text-gray-400">
-          {table.getFilteredRowModel().rows.length.toLocaleString()} of{' '}
-          {data.length.toLocaleString()} records
-        </p>
+        <div className="mb-4 flex items-center justify-between">
+          <div>
+            <h1 className="text-2xl font-bold text-white">
+              Trading Surveillance
+            </h1>
+            <p className="text-sm text-gray-400">
+              {table.getFilteredRowModel().rows.length.toLocaleString()} of{' '}
+              {data.length.toLocaleString()} records
+            </p>
+          </div>
+
+          {/* Virtualization Toggle */}
+          <button
+            onClick={() => setUseVirtualization(!useVirtualization)}
+            className={`rounded-lg px-4 py-2 text-sm font-medium transition-colors ${
+              useVirtualization
+                ? 'bg-green-600 text-white hover:bg-green-700'
+                : 'bg-red-600 text-white hover:bg-red-700'
+            }`}
+          >
+            {useVirtualization ? 'Virtual: ON' : 'Virtual: OFF'}
+            <span className="ml-2 text-xs opacity-75">
+              (~{useVirtualization ? '30' : table.getFilteredRowModel().rows.length.toLocaleString()} DOM rows)
+            </span>
+          </button>
+        </div>
 
         <GlobalSearch
           value={filters.globalFilter}
@@ -93,7 +115,11 @@ function RouteComponent() {
           hasActiveFilters={filters.hasActiveFilters}
         />
 
-        <DataTable table={table} />
+        {useVirtualization ? (
+          <VirtualDataTable table={table} />
+        ) : (
+          <DataTable table={table} />
+        )}
       </div>
     </div>
   )
