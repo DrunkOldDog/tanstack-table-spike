@@ -14,9 +14,9 @@ export function VirtualDataTable({ table }: VirtualDataTableProps) {
 
   const rowVirtualizer = useVirtualizer({
     count: rows.length,
-    estimateSize: () => 53, // Estimated row height in px (py-4 = 16px * 2 + content)
+    estimateSize: () => 53,
     getScrollElement: () => tableContainerRef.current,
-    overscan: 10, // Render 10 extra rows above/below viewport for smooth scrolling
+    overscan: 10,
   })
 
   return (
@@ -25,59 +25,68 @@ export function VirtualDataTable({ table }: VirtualDataTableProps) {
         ref={tableContainerRef}
         className="max-h-[70vh] overflow-auto"
       >
-        <table className="w-full">
-          <thead className="sticky top-0 z-10 bg-gray-700/95 backdrop-blur">
-            {table.getHeaderGroups().map(headerGroup => (
-              <tr key={headerGroup.id}>
-                {headerGroup.headers.map(header => (
-                  <th
-                    key={header.id}
-                    className="px-6 py-4 text-left text-sm font-semibold uppercase tracking-wider text-gray-300"
+        {/* Header - uses flex to match body layout */}
+        <div className="sticky top-0 z-10 flex w-full bg-gray-700/95 backdrop-blur">
+          {table.getHeaderGroups().map(headerGroup =>
+            headerGroup.headers.map(header => (
+              <div
+                key={header.id}
+                className={`flex-1 px-6 py-4 text-left text-sm font-semibold uppercase tracking-wider text-gray-300 ${
+                  header.column.getCanSort() ? 'cursor-pointer select-none hover:text-white' : ''
+                }`}
+                onClick={header.column.getToggleSortingHandler()}
+              >
+                <div className="flex items-center gap-2">
+                  {flexRender(header.column.columnDef.header, header.getContext())}
+                  {{
+                    asc: <span className="text-blue-400">↑</span>,
+                    desc: <span className="text-blue-400">↓</span>,
+                  }[header.column.getIsSorted() as string] ?? (
+                    header.column.getCanSort() ? (
+                      <span className="text-gray-600">↕</span>
+                    ) : null
+                  )}
+                </div>
+              </div>
+            ))
+          )}
+        </div>
+
+        {/* Virtualized Body */}
+        <div
+          style={{
+            height: `${rowVirtualizer.getTotalSize()}px`,
+            position: 'relative',
+          }}
+        >
+          {rowVirtualizer.getVirtualItems().map(virtualRow => {
+            const row = rows[virtualRow.index]
+            return (
+              <div
+                key={row.id}
+                data-index={virtualRow.index}
+                ref={node => rowVirtualizer.measureElement(node)}
+                style={{
+                  position: 'absolute',
+                  top: 0,
+                  left: 0,
+                  width: '100%',
+                  transform: `translateY(${virtualRow.start}px)`,
+                }}
+                className="flex border-b border-gray-700 transition-colors hover:bg-gray-700/30"
+              >
+                {row.getVisibleCells().map(cell => (
+                  <div
+                    key={cell.id}
+                    className="flex-1 px-6 py-4 text-sm text-gray-200"
                   >
-                    {flexRender(
-                      header.column.columnDef.header,
-                      header.getContext(),
-                    )}
-                  </th>
+                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                  </div>
                 ))}
-              </tr>
-            ))}
-          </thead>
-          <tbody
-            style={{
-              height: `${rowVirtualizer.getTotalSize()}px`,
-              position: 'relative',
-            }}
-          >
-            {rowVirtualizer.getVirtualItems().map(virtualRow => {
-              const row = rows[virtualRow.index]
-              return (
-                <tr
-                  key={row.id}
-                  data-index={virtualRow.index}
-                  ref={node => rowVirtualizer.measureElement(node)}
-                  style={{
-                    position: 'absolute',
-                    top: 0,
-                    left: 0,
-                    width: '100%',
-                    transform: `translateY(${virtualRow.start}px)`,
-                  }}
-                  className="flex transition-colors hover:bg-gray-700/30"
-                >
-                  {row.getVisibleCells().map(cell => (
-                    <td
-                      key={cell.id}
-                      className="flex-1 px-6 py-4 text-sm text-gray-200"
-                    >
-                      {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                    </td>
-                  ))}
-                </tr>
-              )
-            })}
-          </tbody>
-        </table>
+              </div>
+            )
+          })}
+        </div>
       </div>
     </div>
   )

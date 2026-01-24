@@ -1,10 +1,6 @@
 import { createColumnHelper } from '@tanstack/react-table'
 import type { StockData } from './types'
-import {
-  fuzzySort,
-  volumeThresholdFilter,
-  dateRangeFilter,
-} from './filters'
+import { volumeThresholdFilter, dateRangeFilter } from './filters'
 
 const columnHelper = createColumnHelper<StockData>()
 
@@ -15,7 +11,7 @@ export const columns = [
       <span className="font-semibold text-blue-400">{info.getValue()}</span>
     ),
     filterFn: 'fuzzy',
-    sortingFn: fuzzySort,
+    enableSorting: false,
   }),
   columnHelper.accessor('date', {
     header: 'Date',
