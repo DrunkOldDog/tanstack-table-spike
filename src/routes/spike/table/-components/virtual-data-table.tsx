@@ -31,9 +31,8 @@ export function VirtualDataTable({ table }: VirtualDataTableProps) {
             headerGroup.headers.map(header => (
               <div
                 key={header.id}
-                className={`flex-1 px-6 py-4 text-left text-sm font-semibold uppercase tracking-wider text-gray-300 ${
-                  header.column.getCanSort() ? 'cursor-pointer select-none hover:text-white' : ''
-                }`}
+                className={`flex-1 px-6 py-4 text-left text-sm font-semibold uppercase tracking-wider text-gray-300 ${header.column.getCanSort() ? 'cursor-pointer select-none hover:text-white' : ''
+                  }`}
                 onClick={header.column.getToggleSortingHandler()}
               >
                 <div className="flex items-center gap-2">
@@ -42,10 +41,10 @@ export function VirtualDataTable({ table }: VirtualDataTableProps) {
                     asc: <span className="text-blue-400">↑</span>,
                     desc: <span className="text-blue-400">↓</span>,
                   }[header.column.getIsSorted() as string] ?? (
-                    header.column.getCanSort() ? (
-                      <span className="text-gray-600">↕</span>
-                    ) : null
-                  )}
+                      header.column.getCanSort() ? (
+                        <span className="text-gray-600">↕</span>
+                      ) : null
+                    )}
                 </div>
               </div>
             ))
