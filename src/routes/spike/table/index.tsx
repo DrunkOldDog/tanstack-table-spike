@@ -6,6 +6,7 @@ import {
   getSortedRowModel,
   useReactTable,
   type SortingState,
+  type VisibilityState,
 } from '@tanstack/react-table'
 import { z } from 'zod'
 import { zodValidator } from '@tanstack/zod-adapter'
@@ -24,6 +25,7 @@ import { FilterBar } from './-components/filter-bar'
 import { ActiveFilters } from './-components/active-filters'
 import { DataTable } from './-components/data-table'
 import { VirtualDataTable } from './-components/virtual-data-table'
+import { ColumnManager } from './-components/column-manager'
 
 const tableSearchSchema = z.object({
   symbol: z.string().optional(),
@@ -41,6 +43,7 @@ export const Route = createFileRoute('/spike/table/')({
 
 function RouteComponent() {
   const [useVirtualization, setUseVirtualization] = useState(true)
+  const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({})
   const { data, loading } = useStockData()
   const filters = useTableFilters(data)
   const { searchParams, setSearchParams } = useTableSearchParams()
@@ -69,10 +72,12 @@ function RouteComponent() {
       columnFilters: filters.columnFilters,
       globalFilter: filters.debouncedGlobalFilter,
       sorting,
+      columnVisibility,
     },
     onColumnFiltersChange: filters.setColumnFilters,
     onGlobalFilterChange: filters.setGlobalFilter,
     onSortingChange: handleSortingChange,
+    onColumnVisibilityChange: setColumnVisibility,
     getCoreRowModel: getCoreRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
     getSortedRowModel: getSortedRowModel(),
@@ -102,20 +107,24 @@ function RouteComponent() {
             </p>
           </div>
 
-          {/* Virtualization Toggle */}
-          <button
-            onClick={() => setUseVirtualization(!useVirtualization)}
-            className={`rounded-lg px-4 py-2 text-sm font-medium transition-colors ${
-              useVirtualization
-                ? 'bg-green-600 text-white hover:bg-green-700'
-                : 'bg-red-600 text-white hover:bg-red-700'
-            }`}
-          >
-            {useVirtualization ? 'Virtual: ON' : 'Virtual: OFF'}
-            <span className="ml-2 text-xs opacity-75">
-              (~{useVirtualization ? '30' : table.getFilteredRowModel().rows.length.toLocaleString()} DOM rows)
-            </span>
-          </button>
+          <div className="flex items-center gap-3">
+            <ColumnManager table={table} />
+
+            {/* Virtualization Toggle */}
+            <button
+              onClick={() => setUseVirtualization(!useVirtualization)}
+              className={`rounded-lg px-4 py-2 text-sm font-medium transition-colors ${
+                useVirtualization
+                  ? 'bg-green-600 text-white hover:bg-green-700'
+                  : 'bg-red-600 text-white hover:bg-red-700'
+              }`}
+            >
+              {useVirtualization ? 'Virtual: ON' : 'Virtual: OFF'}
+              <span className="ml-2 text-xs opacity-75">
+                (~{useVirtualization ? '30' : table.getFilteredRowModel().rows.length.toLocaleString()} DOM rows)
+              </span>
+            </button>
+          </div>
         </div>
 
         <GlobalSearch
