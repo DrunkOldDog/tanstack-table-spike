@@ -12,6 +12,7 @@ export const columns = [
     ),
     filterFn: 'fuzzy',
     enableSorting: false,
+    enableHiding: false,
   }),
   columnHelper.accessor('date', {
     header: 'Date',
