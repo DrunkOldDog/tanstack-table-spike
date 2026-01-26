@@ -1,23 +1,41 @@
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
 import { createFileRoute } from '@tanstack/react-router'
 import {
   getCoreRowModel,
   getFilteredRowModel,
   getSortedRowModel,
   useReactTable,
+  type SortingState,
 } from '@tanstack/react-table'
+import { z } from 'zod'
+import { zodValidator } from '@tanstack/zod-adapter'
 
 import { columns } from './-lib/columns'
 import { fuzzyFilter } from './-lib/filters'
+import {
+  sortingParamToState,
+  sortingStateToParam,
+} from './-lib/sorting-mapper'
 import { useStockData } from './-hooks/use-stock-data'
 import { useTableFilters } from './-hooks/use-table-filters'
+import { useTableSearchParams } from './-hooks/use-table-search-params'
 import { GlobalSearch } from './-components/global-search'
 import { FilterBar } from './-components/filter-bar'
 import { ActiveFilters } from './-components/active-filters'
 import { DataTable } from './-components/data-table'
 import { VirtualDataTable } from './-components/virtual-data-table'
 
+const tableSearchSchema = z.object({
+  symbol: z.string().optional(),
+  volumeThreshold: z.string().optional(),
+  dateFrom: z.string().optional(),
+  dateTo: z.string().optional(),
+  globalFilter: z.string().optional(),
+  sortBy: z.string().optional(),
+})
+
 export const Route = createFileRoute('/spike/table/')({
+  validateSearch: zodValidator(tableSearchSchema),
   component: RouteComponent,
 })
 
@@ -25,6 +43,24 @@ function RouteComponent() {
   const [useVirtualization, setUseVirtualization] = useState(true)
   const { data, loading } = useStockData()
   const filters = useTableFilters(data)
+  const { searchParams, setSearchParams } = useTableSearchParams()
+
+  // Derive sorting state from URL params
+  const sorting = useMemo<SortingState>(
+    () => sortingParamToState(searchParams.sortBy),
+    [searchParams.sortBy],
+  )
+
+  // Handle sorting change by updating URL
+  const handleSortingChange = (
+    updaterOrValue: SortingState | ((prev: SortingState) => SortingState),
+  ) => {
+    const newSorting =
+      typeof updaterOrValue === 'function'
+        ? updaterOrValue(sorting)
+        : updaterOrValue
+    setSearchParams({ sortBy: sortingStateToParam(newSorting) })
+  }
 
   const table = useReactTable({
     data,
@@ -32,9 +68,11 @@ function RouteComponent() {
     state: {
       columnFilters: filters.columnFilters,
       globalFilter: filters.debouncedGlobalFilter,
+      sorting,
     },
     onColumnFiltersChange: filters.setColumnFilters,
     onGlobalFilterChange: filters.setGlobalFilter,
+    onSortingChange: handleSortingChange,
     getCoreRowModel: getCoreRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
     getSortedRowModel: getSortedRowModel(),
