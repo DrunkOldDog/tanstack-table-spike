@@ -6,6 +6,7 @@ import {
   useReactTable,
   type ColumnDef,
   type ColumnFiltersState,
+  type ColumnPinningState,
   type FilterFn,
   type OnChangeFn,
   type SortingState,
@@ -41,7 +42,7 @@ type TablePageProps<T, F extends TableFiltersBase> = {
   filters: F
   searchParams: TableSearchParams
   setSearchParams: (partial: Partial<TableSearchParams>) => void
-  filterFns?: Record<string, FilterFn<T>>
+  filterFns: Record<string, FilterFn<T>>
   renderFilterBar?: (filters: F) => React.ReactNode
   renderActiveFilters?: (filters: F) => React.ReactNode
   enableVirtualization?: boolean
@@ -64,6 +65,28 @@ export function TablePage<T, F extends TableFiltersBase>({
     enableVirtualization,
   )
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({})
+
+  // Initialize column pinning from column meta defaults
+  const initialColumnPinning = useMemo<ColumnPinningState>(() => {
+    const left: string[] = []
+    const right: string[] = []
+
+    columns.forEach((col) => {
+      const accessorKey = 'accessorKey' in col ? (col.accessorKey as string) : undefined      
+      const id = accessorKey ?? col.id
+      const defaultPinned = col.meta?.defaultPinned
+      if (id && defaultPinned === 'left') {
+        left.push(id)
+      } else if (id && defaultPinned === 'right') {
+        right.push(id)
+      }
+    })
+
+    return { left, right }
+  }, [columns])
+
+  const [columnPinning, setColumnPinning] =
+    useState<ColumnPinningState>(initialColumnPinning)
 
   const sorting = useMemo<SortingState>(
     () => sortingParamToState(searchParams.sortBy),
@@ -88,16 +111,23 @@ export function TablePage<T, F extends TableFiltersBase>({
       globalFilter: filters.debouncedGlobalFilter,
       sorting,
       columnVisibility,
+      columnPinning,
     },
     onColumnFiltersChange: filters.setColumnFilters,
     onGlobalFilterChange: filters.setGlobalFilter,
     onSortingChange: handleSortingChange,
     onColumnVisibilityChange: setColumnVisibility,
+    onColumnPinningChange: setColumnPinning,
     getCoreRowModel: getCoreRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
     getSortedRowModel: getSortedRowModel(),
     filterFns,
     globalFilterFn: 'fuzzy',
+    // Multi-column sorting
+    enableMultiSort: true,
+    maxMultiSortColCount: 3,
+    // Column pinning
+    enableColumnPinning: true,
   })
 
   if (loading) {
