@@ -1,11 +1,10 @@
 import { flexRender, type Table } from '@tanstack/react-table'
-import type { StockData } from '../-lib/types'
 
-interface DataTableProps {
-  table: Table<StockData>
+interface DataTableProps<T> {
+  table: Table<T>
 }
 
-export function DataTable({ table }: DataTableProps) {
+export function DataTable<T>({ table }: DataTableProps<T>) {
   return (
     <div className="overflow-hidden rounded-lg border border-gray-700 bg-gray-800 shadow-xl">
       <div className="max-h-[70vh] overflow-auto">

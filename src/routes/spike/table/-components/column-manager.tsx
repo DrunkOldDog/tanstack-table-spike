@@ -9,13 +9,12 @@ import {
 } from '@/components/ui/popover'
 import { Checkbox } from '@/components/ui/checkbox'
 import { LayoutGrid } from 'lucide-react'
-import type { StockData } from '../-lib/types'
 
-interface ColumnManagerProps {
-  table: Table<StockData>
+interface ColumnManagerProps<T> {
+  table: Table<T>
 }
 
-export function ColumnManager({ table }: ColumnManagerProps) {
+export function ColumnManager<T>({ table }: ColumnManagerProps<T>) {
   return (
     <Popover>
       <PopoverTrigger asChild>
@@ -37,9 +36,8 @@ export function ColumnManager({ table }: ColumnManagerProps) {
             return (
               <label
                 key={column.id}
-                className={`flex items-center gap-3 text-sm ${
-                  !canHide ? 'cursor-not-allowed opacity-50' : 'cursor-pointer'
-                }`}
+                className={`flex items-center gap-3 text-sm ${!canHide ? 'cursor-not-allowed opacity-50' : 'cursor-pointer'
+                  }`}
               >
                 <Checkbox
                   checked={column.getIsVisible()}

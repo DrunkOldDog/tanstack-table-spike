@@ -1,13 +1,12 @@
 import { useRef } from 'react'
 import { flexRender, type Table } from '@tanstack/react-table'
 import { useVirtualizer } from '@tanstack/react-virtual'
-import type { StockData } from '../-lib/types'
 
-interface VirtualDataTableProps {
-  table: Table<StockData>
+interface VirtualDataTableProps<T> {
+  table: Table<T>
 }
 
-export function VirtualDataTable({ table }: VirtualDataTableProps) {
+export function VirtualDataTable<T>({ table }: VirtualDataTableProps<T>) {
   const tableContainerRef = useRef<HTMLDivElement>(null)
 
   const { rows } = table.getRowModel()
