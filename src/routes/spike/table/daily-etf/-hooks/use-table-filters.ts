@@ -1,7 +1,7 @@
 import { useMemo, useState, useEffect } from 'react'
 import type { ColumnFiltersState } from '@tanstack/react-table'
 import type { StockData } from '../-lib/types'
-import { useDebounce } from './use-debounce'
+import { useDebounce } from '../../-hooks/use-debounce'
 import { useTableSearchParams } from './use-table-search-params'
 
 export function useTableFilters(data: StockData[]) {

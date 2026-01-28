@@ -17,6 +17,8 @@ import { Route as DemoStartServerFuncsRouteImport } from './routes/demo/start.se
 import { Route as DemoStartApiRequestRouteImport } from './routes/demo/start.api-request'
 import { Route as DemoApiTqTodosRouteImport } from './routes/demo/api.tq-todos'
 import { Route as DemoApiNamesRouteImport } from './routes/demo/api.names'
+import { Route as SpikeTableHousePricesIndexRouteImport } from './routes/spike/table/house-prices/index'
+import { Route as SpikeTableDailyEtfIndexRouteImport } from './routes/spike/table/daily-etf/index'
 import { Route as DemoStartSsrIndexRouteImport } from './routes/demo/start.ssr.index'
 import { Route as DemoStartSsrSpaModeRouteImport } from './routes/demo/start.ssr.spa-mode'
 import { Route as DemoStartSsrFullSsrRouteImport } from './routes/demo/start.ssr.full-ssr'
@@ -62,6 +64,17 @@ const DemoApiNamesRoute = DemoApiNamesRouteImport.update({
   path: '/demo/api/names',
   getParentRoute: () => rootRouteImport,
 } as any)
+const SpikeTableHousePricesIndexRoute =
+  SpikeTableHousePricesIndexRouteImport.update({
+    id: '/spike/table/house-prices/',
+    path: '/spike/table/house-prices/',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const SpikeTableDailyEtfIndexRoute = SpikeTableDailyEtfIndexRouteImport.update({
+  id: '/spike/table/daily-etf/',
+  path: '/spike/table/daily-etf/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const DemoStartSsrIndexRoute = DemoStartSsrIndexRouteImport.update({
   id: '/demo/start/ssr/',
   path: '/demo/start/ssr/',
@@ -96,6 +109,8 @@ export interface FileRoutesByFullPath {
   '/demo/start/ssr/full-ssr': typeof DemoStartSsrFullSsrRoute
   '/demo/start/ssr/spa-mode': typeof DemoStartSsrSpaModeRoute
   '/demo/start/ssr/': typeof DemoStartSsrIndexRoute
+  '/spike/table/daily-etf/': typeof SpikeTableDailyEtfIndexRoute
+  '/spike/table/house-prices/': typeof SpikeTableHousePricesIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -110,6 +125,8 @@ export interface FileRoutesByTo {
   '/demo/start/ssr/full-ssr': typeof DemoStartSsrFullSsrRoute
   '/demo/start/ssr/spa-mode': typeof DemoStartSsrSpaModeRoute
   '/demo/start/ssr': typeof DemoStartSsrIndexRoute
+  '/spike/table/daily-etf': typeof SpikeTableDailyEtfIndexRoute
+  '/spike/table/house-prices': typeof SpikeTableHousePricesIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -125,6 +142,8 @@ export interface FileRoutesById {
   '/demo/start/ssr/full-ssr': typeof DemoStartSsrFullSsrRoute
   '/demo/start/ssr/spa-mode': typeof DemoStartSsrSpaModeRoute
   '/demo/start/ssr/': typeof DemoStartSsrIndexRoute
+  '/spike/table/daily-etf/': typeof SpikeTableDailyEtfIndexRoute
+  '/spike/table/house-prices/': typeof SpikeTableHousePricesIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -141,6 +160,8 @@ export interface FileRouteTypes {
     | '/demo/start/ssr/full-ssr'
     | '/demo/start/ssr/spa-mode'
     | '/demo/start/ssr/'
+    | '/spike/table/daily-etf/'
+    | '/spike/table/house-prices/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -155,6 +176,8 @@ export interface FileRouteTypes {
     | '/demo/start/ssr/full-ssr'
     | '/demo/start/ssr/spa-mode'
     | '/demo/start/ssr'
+    | '/spike/table/daily-etf'
+    | '/spike/table/house-prices'
   id:
     | '__root__'
     | '/'
@@ -169,6 +192,8 @@ export interface FileRouteTypes {
     | '/demo/start/ssr/full-ssr'
     | '/demo/start/ssr/spa-mode'
     | '/demo/start/ssr/'
+    | '/spike/table/daily-etf/'
+    | '/spike/table/house-prices/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -184,6 +209,8 @@ export interface RootRouteChildren {
   DemoStartSsrFullSsrRoute: typeof DemoStartSsrFullSsrRoute
   DemoStartSsrSpaModeRoute: typeof DemoStartSsrSpaModeRoute
   DemoStartSsrIndexRoute: typeof DemoStartSsrIndexRoute
+  SpikeTableDailyEtfIndexRoute: typeof SpikeTableDailyEtfIndexRoute
+  SpikeTableHousePricesIndexRoute: typeof SpikeTableHousePricesIndexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -244,6 +271,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DemoApiNamesRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/spike/table/house-prices/': {
+      id: '/spike/table/house-prices/'
+      path: '/spike/table/house-prices'
+      fullPath: '/spike/table/house-prices/'
+      preLoaderRoute: typeof SpikeTableHousePricesIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/spike/table/daily-etf/': {
+      id: '/spike/table/daily-etf/'
+      path: '/spike/table/daily-etf'
+      fullPath: '/spike/table/daily-etf/'
+      preLoaderRoute: typeof SpikeTableDailyEtfIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/demo/start/ssr/': {
       id: '/demo/start/ssr/'
       path: '/demo/start/ssr'
@@ -288,6 +329,8 @@ const rootRouteChildren: RootRouteChildren = {
   DemoStartSsrFullSsrRoute: DemoStartSsrFullSsrRoute,
   DemoStartSsrSpaModeRoute: DemoStartSsrSpaModeRoute,
   DemoStartSsrIndexRoute: DemoStartSsrIndexRoute,
+  SpikeTableDailyEtfIndexRoute: SpikeTableDailyEtfIndexRoute,
+  SpikeTableHousePricesIndexRoute: SpikeTableHousePricesIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

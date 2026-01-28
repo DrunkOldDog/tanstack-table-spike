@@ -1,19 +1,22 @@
 import { getRouteApi, useNavigate } from '@tanstack/react-router'
-import { cleanEmptyParams } from '../-lib/clean-params'
+import { cleanEmptyParams } from '../../-lib/clean-params'
 
-const routeApi = getRouteApi('/spike/table/')
+const routeApi = getRouteApi('/spike/table/house-prices/')
 
 export type TableSearchParams = {
-  symbol?: string
-  volumeThreshold?: string
-  dateFrom?: string
-  dateTo?: string
+  bedrooms?: string
+  bathrooms?: string
+  furnishingstatus?: string
+  priceMin?: string
+  priceMax?: string
+  areaMin?: string
+  areaMax?: string
   globalFilter?: string
   sortBy?: string
 }
 
 export function useTableSearchParams() {
-  const navigate = useNavigate({ from: '/spike/table/' })
+  const navigate = useNavigate({ from: '/spike/table/house-prices/' })
   const searchParams = routeApi.useSearch() as TableSearchParams
 
   const setSearchParams = (partial: Partial<TableSearchParams>) =>
