@@ -1,10 +1,14 @@
-import { Link } from '@tanstack/react-router'
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
+import { Link, useRouter } from '@tanstack/react-router'
+import { useAuth } from '@workos/authkit-tanstack-react-start/client';
 
 import { useState } from 'react'
 import {
+  ChevronDownIcon,
   // ChevronDown,
   // ChevronRight,
   Home,
+  LogOut,
   Menu,
   // Network,
   // SquareFunction,
@@ -14,30 +18,59 @@ import {
 } from 'lucide-react'
 
 export default function Header() {
+  const { user, loading, signOut } = useAuth();
   const [isOpen, setIsOpen] = useState(false)
+  const { navigate } = useRouter();
   // const [groupedExpanded, setGroupedExpanded] = useState<
   //   Record<string, boolean>
   // >({})
 
+  const renderSignInButton = () => {
+    if (loading) {
+      return <span>Loading...</span>
+    }
+
+    if (user) {
+      return <DropdownMenu>
+        <DropdownMenuTrigger>
+          <button className='font-bold flex items-center gap-1 py-1 px-2 rounded-md hover:bg-gray-700 transition-colors'>
+            Hey, {user.firstName}! <ChevronDownIcon size={16} />
+          </button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent>
+          <DropdownMenuItem onClick={() => { signOut() }}>
+            <LogOut size={24} />
+            Sign Out
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
+    }
+
+    return <button onClick={() => { navigate({ to: '/auth/login' }) }}>Sign In</button>
+  }
+
   return (
     <>
-      <header className="p-4 flex items-center bg-gray-800 text-white shadow-lg">
-        <button
-          onClick={() => setIsOpen(true)}
-          className="p-2 hover:bg-gray-700 rounded-lg transition-colors"
-          aria-label="Open menu"
-        >
-          <Menu size={24} />
-        </button>
-        <h1 className="ml-4 text-xl font-semibold">
-          <Link to="/">Trillium Surveyor</Link>
-        </h1>
+      <header className="p-4 flex items-center justify-between bg-gray-800 text-white shadow-lg">
+        <div className="flex items-center">
+          <button
+            onClick={() => setIsOpen(true)}
+            className="p-2 hover:bg-gray-700 rounded-lg transition-colors"
+            aria-label="Open menu"
+          >
+            <Menu size={24} />
+          </button>
+          <h1 className="ml-4 text-xl font-semibold">
+            <Link to="/">Trillium Surveyor</Link>
+          </h1>
+        </div>
+
+        {renderSignInButton()}
       </header>
 
       <aside
-        className={`fixed top-0 left-0 h-full w-80 bg-gray-900 text-white shadow-2xl z-50 transform transition-transform duration-300 ease-in-out flex flex-col ${
-          isOpen ? 'translate-x-0' : '-translate-x-full'
-        }`}
+        className={`fixed top-0 left-0 h-full w-80 bg-gray-900 text-white shadow-2xl z-50 transform transition-transform duration-300 ease-in-out flex flex-col ${isOpen ? 'translate-x-0' : '-translate-x-full'
+          }`}
       >
         <div className="flex items-center justify-between p-4 border-b border-gray-700">
           <h2 className="text-xl font-bold">Navigation</h2>

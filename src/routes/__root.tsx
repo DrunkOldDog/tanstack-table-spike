@@ -5,6 +5,7 @@ import {
 } from '@tanstack/react-router'
 import { TanStackRouterDevtoolsPanel } from '@tanstack/react-router-devtools'
 import { TanStackDevtools } from '@tanstack/react-devtools'
+import { AuthKitProvider } from '@workos/authkit-tanstack-react-start/client';
 
 import Header from '../components/Header'
 
@@ -50,8 +51,10 @@ function RootDocument({ children }: { children: React.ReactNode }) {
         <HeadContent />
       </head>
       <body>
-        <Header />
-        {children}
+        <AuthKitProvider>
+          <Header />
+          {children}
+        </AuthKitProvider>
         <TanStackDevtools
           config={{
             position: 'bottom-right',
