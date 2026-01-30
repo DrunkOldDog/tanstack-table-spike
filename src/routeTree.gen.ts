@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as TestAuthHeaderRouteImport } from './routes/test/auth-header'
 import { Route as DemoTanstackQueryRouteImport } from './routes/demo/tanstack-query'
 import { Route as DemoTableRouteImport } from './routes/demo/table'
 import { Route as SpikeTableRouteRouteImport } from './routes/spike/table/route'
@@ -29,6 +30,11 @@ import { Route as DemoStartSsrDataOnlyRouteImport } from './routes/demo/start.ss
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TestAuthHeaderRoute = TestAuthHeaderRouteImport.update({
+  id: '/test/auth-header',
+  path: '/test/auth-header',
   getParentRoute: () => rootRouteImport,
 } as any)
 const DemoTanstackQueryRoute = DemoTanstackQueryRouteImport.update({
@@ -113,6 +119,7 @@ export interface FileRoutesByFullPath {
   '/spike/table': typeof SpikeTableRouteRouteWithChildren
   '/demo/table': typeof DemoTableRoute
   '/demo/tanstack-query': typeof DemoTanstackQueryRoute
+  '/test/auth-header': typeof TestAuthHeaderRoute
   '/api/auth/callback': typeof ApiAuthCallbackRoute
   '/demo/api/names': typeof DemoApiNamesRoute
   '/demo/api/tq-todos': typeof DemoApiTqTodosRoute
@@ -131,6 +138,7 @@ export interface FileRoutesByTo {
   '/spike/table': typeof SpikeTableRouteRouteWithChildren
   '/demo/table': typeof DemoTableRoute
   '/demo/tanstack-query': typeof DemoTanstackQueryRoute
+  '/test/auth-header': typeof TestAuthHeaderRoute
   '/api/auth/callback': typeof ApiAuthCallbackRoute
   '/demo/api/names': typeof DemoApiNamesRoute
   '/demo/api/tq-todos': typeof DemoApiTqTodosRoute
@@ -150,6 +158,7 @@ export interface FileRoutesById {
   '/spike/table': typeof SpikeTableRouteRouteWithChildren
   '/demo/table': typeof DemoTableRoute
   '/demo/tanstack-query': typeof DemoTanstackQueryRoute
+  '/test/auth-header': typeof TestAuthHeaderRoute
   '/api/auth/callback': typeof ApiAuthCallbackRoute
   '/demo/api/names': typeof DemoApiNamesRoute
   '/demo/api/tq-todos': typeof DemoApiTqTodosRoute
@@ -170,6 +179,7 @@ export interface FileRouteTypes {
     | '/spike/table'
     | '/demo/table'
     | '/demo/tanstack-query'
+    | '/test/auth-header'
     | '/api/auth/callback'
     | '/demo/api/names'
     | '/demo/api/tq-todos'
@@ -188,6 +198,7 @@ export interface FileRouteTypes {
     | '/spike/table'
     | '/demo/table'
     | '/demo/tanstack-query'
+    | '/test/auth-header'
     | '/api/auth/callback'
     | '/demo/api/names'
     | '/demo/api/tq-todos'
@@ -206,6 +217,7 @@ export interface FileRouteTypes {
     | '/spike/table'
     | '/demo/table'
     | '/demo/tanstack-query'
+    | '/test/auth-header'
     | '/api/auth/callback'
     | '/demo/api/names'
     | '/demo/api/tq-todos'
@@ -225,6 +237,7 @@ export interface RootRouteChildren {
   SpikeTableRouteRoute: typeof SpikeTableRouteRouteWithChildren
   DemoTableRoute: typeof DemoTableRoute
   DemoTanstackQueryRoute: typeof DemoTanstackQueryRoute
+  TestAuthHeaderRoute: typeof TestAuthHeaderRoute
   ApiAuthCallbackRoute: typeof ApiAuthCallbackRoute
   DemoApiNamesRoute: typeof DemoApiNamesRoute
   DemoApiTqTodosRoute: typeof DemoApiTqTodosRoute
@@ -244,6 +257,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/test/auth-header': {
+      id: '/test/auth-header'
+      path: '/test/auth-header'
+      fullPath: '/test/auth-header'
+      preLoaderRoute: typeof TestAuthHeaderRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/demo/tanstack-query': {
@@ -373,6 +393,7 @@ const rootRouteChildren: RootRouteChildren = {
   SpikeTableRouteRoute: SpikeTableRouteRouteWithChildren,
   DemoTableRoute: DemoTableRoute,
   DemoTanstackQueryRoute: DemoTanstackQueryRoute,
+  TestAuthHeaderRoute: TestAuthHeaderRoute,
   ApiAuthCallbackRoute: ApiAuthCallbackRoute,
   DemoApiNamesRoute: DemoApiNamesRoute,
   DemoApiTqTodosRoute: DemoApiTqTodosRoute,
