@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react'
 import {
   getCoreRowModel,
   getFilteredRowModel,
+  getPaginationRowModel,
   getSortedRowModel,
   useReactTable,
   type ColumnDef,
@@ -9,6 +10,7 @@ import {
   type ColumnPinningState,
   type FilterFn,
   type OnChangeFn,
+  type PaginationState,
   type SortingState,
   type VisibilityState,
 } from '@tanstack/react-table'
@@ -21,6 +23,7 @@ import { GlobalSearch } from './global-search'
 import { DataTable } from './data-table'
 import { VirtualDataTable } from './virtual-data-table'
 import { ColumnManager } from './column-manager'
+import { Pagination, type PaginationProps } from './pagination'
 
 type TableSearchParams = {
   sortBy?: string
@@ -45,7 +48,8 @@ type TablePageProps<T, F extends TableFiltersBase> = {
   filterFns: Record<string, FilterFn<T>>
   renderFilterBar?: (filters: F) => React.ReactNode
   renderActiveFilters?: (filters: F) => React.ReactNode
-  enableVirtualization?: boolean
+  virtual?: boolean
+  pagination?: Omit<PaginationProps, 'total' | 'current' | 'pageSize' | 'onChange'>
 }
 
 export function TablePage<T, F extends TableFiltersBase>({
@@ -59,12 +63,15 @@ export function TablePage<T, F extends TableFiltersBase>({
   filterFns,
   renderFilterBar,
   renderActiveFilters,
-  enableVirtualization = false,
+  virtual = false,
+  pagination: paginationProps,
 }: TablePageProps<T, F>) {
-  const [useVirtualization, setUseVirtualization] = useState(
-    enableVirtualization,
-  )
+  const [useVirtualization, setUseVirtualization] = useState(virtual)
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({})
+  const [pagination, setPagination] = useState<PaginationState>({
+    pageIndex: (paginationProps?.defaultCurrent ?? 1) - 1,
+    pageSize: paginationProps?.defaultPageSize ?? 10,
+  })
 
   // Initialize column pinning from column meta defaults
   const initialColumnPinning = useMemo<ColumnPinningState>(() => {
@@ -112,15 +119,18 @@ export function TablePage<T, F extends TableFiltersBase>({
       sorting,
       columnVisibility,
       columnPinning,
+      ...(!useVirtualization && { pagination }),
     },
     onColumnFiltersChange: filters.setColumnFilters,
     onGlobalFilterChange: filters.setGlobalFilter,
     onSortingChange: handleSortingChange,
     onColumnVisibilityChange: setColumnVisibility,
     onColumnPinningChange: setColumnPinning,
+    onPaginationChange: setPagination,
     getCoreRowModel: getCoreRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
     getSortedRowModel: getSortedRowModel(),
+    ...(!useVirtualization && { getPaginationRowModel: getPaginationRowModel() }),
     filterFns,
     globalFilterFn: 'fuzzy',
     // Multi-column sorting
@@ -153,7 +163,7 @@ export function TablePage<T, F extends TableFiltersBase>({
           <div className="flex items-center gap-3">
             <ColumnManager table={table} />
 
-            {enableVirtualization ? (
+            {virtual ? (
               <button
                 onClick={() => setUseVirtualization(!useVirtualization)}
                 className={`rounded-lg px-4 py-2 text-sm font-medium transition-colors ${
@@ -184,10 +194,21 @@ export function TablePage<T, F extends TableFiltersBase>({
 
         {renderActiveFilters?.(filters)}
 
-        {enableVirtualization && useVirtualization ? (
+        {virtual && useVirtualization ? (
           <VirtualDataTable table={table} />
         ) : (
-          <DataTable table={table} />
+          <>
+            <DataTable table={table} />
+            <Pagination
+              {...paginationProps}
+              total={table.getFilteredRowModel().rows.length}
+              current={pagination.pageIndex + 1}
+              pageSize={pagination.pageSize}
+              onChange={(page, pageSize) => {
+                setPagination({ pageIndex: page - 1, pageSize })
+              }}
+            />
+          </>
         )}
       </div>
     </div>

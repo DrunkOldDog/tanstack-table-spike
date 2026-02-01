@@ -40,7 +40,7 @@ function RouteComponent() {
       searchParams={searchParams}
       setSearchParams={setSearchParams}
       filterFns={{ fuzzy: fuzzyFilter }}
-      enableVirtualization
+      virtual
       renderFilterBar={(tableFilters) => (
         <FilterBar
           selectedSymbol={tableFilters.selectedSymbol}
