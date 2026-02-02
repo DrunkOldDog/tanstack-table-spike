@@ -1,78 +1,63 @@
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
+import type { Table } from '@tanstack/react-table'
 
 type PaginationAlign = 'left' | 'center' | 'right'
 
-export interface PaginationProps {
+export interface PaginationProps<T> {
+  table: Table<T>
   align?: PaginationAlign
   current?: number
-  defaultCurrent?: number
-  defaultPageSize?: number
   disabled?: boolean
   pageSize?: number
   pageSizeOptions?: number[]
   showQuickJumper?: boolean
   showSizeChanger?: boolean
-  total: number
+  total?: number
   onChange?: (page: number, pageSize: number) => void
 }
 
-export function Pagination({
+export function Pagination<T>({
+  table,
   align = 'right',
   current,
-  defaultCurrent = 1,
-  defaultPageSize = 10,
   disabled = false,
   pageSize: controlledPageSize,
   pageSizeOptions = [10, 20, 50, 100],
   showQuickJumper = false,
   showSizeChanger = false,
-  total,
+  total: controlledTotal,
   onChange,
-}: PaginationProps) {
-  const [internalPage, setInternalPage] = useState(defaultCurrent)
-  const [internalPageSize, setInternalPageSize] = useState(defaultPageSize)
+}: PaginationProps<T>) {
   const [jumpValue, setJumpValue] = useState('')
 
-  const page = current ?? internalPage
-  const pageSize = controlledPageSize ?? internalPageSize
-  const totalPages = Math.ceil(total / pageSize)
-
-  useEffect(() => {
-    if (current !== undefined) {
-      setInternalPage(current)
-    }
-  }, [current])
-
-  useEffect(() => {
-    if (controlledPageSize !== undefined) {
-      setInternalPageSize(controlledPageSize)
-    }
-  }, [controlledPageSize])
+  const tableState = table.getState().pagination
+  const pageIndex = current !== undefined ? current - 1 : tableState.pageIndex
+  const pageSize = controlledPageSize ?? tableState.pageSize
+  const total = controlledTotal ?? table.getFilteredRowModel().rows.length
+  const pageCount = Math.ceil(total / pageSize)
 
   const handlePageChange = (newPage: number) => {
-    if (disabled || newPage < 1 || newPage > totalPages) return
     if (current === undefined) {
-      setInternalPage(newPage)
+      table.setPageIndex(newPage - 1)
     }
     onChange?.(newPage, pageSize)
   }
 
-  const handlePageSizeChange = (newPageSize: number) => {
-    if (disabled) return
-    const newTotalPages = Math.ceil(total / newPageSize)
-    const newPage = Math.min(page, newTotalPages)
+  const handlePageSizeChange = (newSize: number) => {
+    const newPageCount = Math.ceil(total / newSize)
+    const newPage = Math.min(pageIndex + 1, newPageCount)
     if (controlledPageSize === undefined) {
-      setInternalPageSize(newPageSize)
+      table.setPageSize(newSize)
     }
-    if (current === undefined && newPage !== page) {
-      setInternalPage(newPage)
+    if (current === undefined && newPage !== pageIndex + 1) {
+      table.setPageIndex(newPage - 1)
     }
-    onChange?.(newPage, newPageSize)
+    onChange?.(newPage, newSize)
   }
 
   const handleJump = () => {
     const jumpPage = parseInt(jumpValue, 10)
-    if (!isNaN(jumpPage) && jumpPage >= 1 && jumpPage <= totalPages) {
+    if (!isNaN(jumpPage) && jumpPage >= 1 && jumpPage <= pageCount) {
       handlePageChange(jumpPage)
     }
     setJumpValue('')
@@ -80,23 +65,23 @@ export function Pagination({
 
   const getPageNumbers = () => {
     const pages: (number | 'ellipsis')[] = []
-    const showPages = 5
+    const currentPage = pageIndex + 1
 
-    if (totalPages <= showPages + 2) {
-      for (let i = 1; i <= totalPages; i++) pages.push(i)
+    if (pageCount <= 7) {
+      for (let i = 1; i <= pageCount; i++) pages.push(i)
     } else {
       pages.push(1)
 
-      if (page > 3) pages.push('ellipsis')
+      if (currentPage > 3) pages.push('ellipsis')
 
-      const start = Math.max(2, page - 1)
-      const end = Math.min(totalPages - 1, page + 1)
+      const start = Math.max(2, currentPage - 1)
+      const end = Math.min(pageCount - 1, currentPage + 1)
 
       for (let i = start; i <= end; i++) pages.push(i)
 
-      if (page < totalPages - 2) pages.push('ellipsis')
+      if (currentPage < pageCount - 2) pages.push('ellipsis')
 
-      pages.push(totalPages)
+      pages.push(pageCount)
     }
 
     return pages
@@ -113,7 +98,11 @@ export function Pagination({
   const buttonDefault = `${buttonBase} text-gray-300 hover:bg-gray-700 hover:text-white`
   const buttonActive = `${buttonBase} bg-blue-600 text-white`
 
-  if (totalPages === 0) return null
+  if (pageCount === 0) return null
+
+  const currentPage = pageIndex + 1
+  const canPreviousPage = currentPage > 1
+  const canNextPage = currentPage < pageCount
 
   return (
     <div className={`mt-4 flex items-center gap-2 ${alignClass}`}>
@@ -133,8 +122,8 @@ export function Pagination({
       )}
 
       <button
-        onClick={() => handlePageChange(page - 1)}
-        disabled={disabled || page === 1}
+        onClick={() => handlePageChange(currentPage - 1)}
+        disabled={disabled || !canPreviousPage}
         className={buttonDefault}
       >
         ←
@@ -150,7 +139,7 @@ export function Pagination({
             key={p}
             onClick={() => handlePageChange(p)}
             disabled={disabled}
-            className={p === page ? buttonActive : buttonDefault}
+            className={p === currentPage ? buttonActive : buttonDefault}
           >
             {p}
           </button>
@@ -158,8 +147,8 @@ export function Pagination({
       )}
 
       <button
-        onClick={() => handlePageChange(page + 1)}
-        disabled={disabled || page === totalPages}
+        onClick={() => handlePageChange(currentPage + 1)}
+        disabled={disabled || !canNextPage}
         className={buttonDefault}
       >
         →
@@ -175,14 +164,14 @@ export function Pagination({
             onKeyDown={(e) => e.key === 'Enter' && handleJump()}
             disabled={disabled}
             min={1}
-            max={totalPages}
+            max={pageCount}
             className="w-16 rounded border border-gray-600 bg-gray-800 px-2 py-1 text-sm text-gray-300 focus:border-blue-500 focus:outline-none disabled:opacity-50"
           />
         </div>
       )}
 
       <span className="ml-2 text-sm text-gray-400">
-        {(page - 1) * pageSize + 1}-{Math.min(page * pageSize, total)} of {total}
+        {pageIndex * pageSize + 1}-{Math.min((pageIndex + 1) * pageSize, total)} of {total}
       </span>
     </div>
   )

@@ -10,7 +10,6 @@ import {
   type ColumnPinningState,
   type FilterFn,
   type OnChangeFn,
-  type PaginationState,
   type SortingState,
   type VisibilityState,
 } from '@tanstack/react-table'
@@ -49,7 +48,10 @@ type TablePageProps<T, F extends TableFiltersBase> = {
   renderFilterBar?: (filters: F) => React.ReactNode
   renderActiveFilters?: (filters: F) => React.ReactNode
   virtual?: boolean
-  pagination?: Omit<PaginationProps, 'total' | 'current' | 'pageSize' | 'onChange'>
+  pagination?: Omit<PaginationProps<T>, 'table'> & {
+    defaultCurrent?: number
+    defaultPageSize?: number
+  }
 }
 
 export function TablePage<T, F extends TableFiltersBase>({
@@ -68,10 +70,6 @@ export function TablePage<T, F extends TableFiltersBase>({
 }: TablePageProps<T, F>) {
   const [useVirtualization, setUseVirtualization] = useState(virtual)
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({})
-  const [pagination, setPagination] = useState<PaginationState>({
-    pageIndex: (paginationProps?.defaultCurrent ?? 1) - 1,
-    pageSize: paginationProps?.defaultPageSize ?? 10,
-  })
 
   // Initialize column pinning from column meta defaults
   const initialColumnPinning = useMemo<ColumnPinningState>(() => {
@@ -119,14 +117,18 @@ export function TablePage<T, F extends TableFiltersBase>({
       sorting,
       columnVisibility,
       columnPinning,
-      ...(!useVirtualization && { pagination }),
+    },
+    initialState: {
+      pagination: {
+        pageIndex: (paginationProps?.defaultCurrent ?? 1) - 1,
+        pageSize: paginationProps?.defaultPageSize ?? 10,
+      },
     },
     onColumnFiltersChange: filters.setColumnFilters,
     onGlobalFilterChange: filters.setGlobalFilter,
     onSortingChange: handleSortingChange,
     onColumnVisibilityChange: setColumnVisibility,
     onColumnPinningChange: setColumnPinning,
-    onPaginationChange: setPagination,
     getCoreRowModel: getCoreRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
     getSortedRowModel: getSortedRowModel(),
@@ -199,15 +201,7 @@ export function TablePage<T, F extends TableFiltersBase>({
         ) : (
           <>
             <DataTable table={table} />
-            <Pagination
-              {...paginationProps}
-              total={table.getFilteredRowModel().rows.length}
-              current={pagination.pageIndex + 1}
-              pageSize={pagination.pageSize}
-              onChange={(page, pageSize) => {
-                setPagination({ pageIndex: page - 1, pageSize })
-              }}
-            />
+            <Pagination table={table} {...paginationProps} />
           </>
         )}
       </div>
