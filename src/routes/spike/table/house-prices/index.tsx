@@ -91,6 +91,11 @@ function RouteComponent() {
           hasActiveFilters={tableFilters.hasActiveFilters}
         />
       )}
+      getRowId={(row) => `${row.area}-${row.price}`}
+      rowSelection={{
+        fixed: true,
+        hideSelectAll: true,
+      }}
     />
   )
 }
