@@ -1,37 +1,10 @@
-import type { CSSProperties } from 'react'
 import { useRef } from 'react'
-import { flexRender, type Column, type Table } from '@tanstack/react-table'
+import { flexRender, type Table } from '@tanstack/react-table'
 import { useVirtualizer } from '@tanstack/react-virtual'
+import { getPinningStyles } from './table-utils'
 
 interface VirtualDataTableProps<T> {
   table: Table<T>
-}
-
-/**
- * Get pinning styles for a column in a flex layout
- */
-function getPinningStyles<T>(column: Column<T, unknown>): CSSProperties {
-  const isPinned = column.getIsPinned()
-  const isLastLeftPinned =
-    isPinned === 'left' && column.getIsLastColumn('left')
-  const isFirstRightPinned =
-    isPinned === 'right' && column.getIsFirstColumn('right')
-
-  return {
-    boxShadow: isLastLeftPinned
-      ? '-4px 0 4px -4px gray inset'
-      : isFirstRightPinned
-        ? '4px 0 4px -4px gray inset'
-        : undefined,
-    left: isPinned === 'left' ? `${column.getStart('left')}px` : undefined,
-    right: isPinned === 'right' ? `${column.getAfter('right')}px` : undefined,
-    position: isPinned ? 'sticky' : 'relative',
-    width: column.getSize(),
-    minWidth: column.getSize(),
-    maxWidth: column.getSize(),
-    zIndex: isPinned ? 1 : 0,
-    flex: isPinned ? 'none' : '1',
-  }
 }
 
 export function VirtualDataTable<T>({ table }: VirtualDataTableProps<T>) {
@@ -59,7 +32,7 @@ export function VirtualDataTable<T>({ table }: VirtualDataTableProps<T>) {
                 <div
                   key={header.id}
                   className={`px-6 py-4 text-left text-sm font-semibold uppercase tracking-wider text-gray-300 ${header.column.getCanSort() ? 'cursor-pointer select-none hover:text-white' : ''} ${isPinned ? 'bg-gray-700' : ''}`}
-                  style={getPinningStyles(header.column)}
+                  style={getPinningStyles(header.column, { flex: true })}
                   onClick={header.column.getToggleSortingHandler()}
                 >
                   <div className="flex items-center gap-2">
@@ -119,7 +92,7 @@ export function VirtualDataTable<T>({ table }: VirtualDataTableProps<T>) {
                     <div
                       key={cell.id}
                       className={`px-6 py-4 text-sm text-gray-200 ${isPinned ? 'bg-gray-800' : ''}`}
-                      style={getPinningStyles(cell.column)}
+                      style={getPinningStyles(cell.column, { flex: true })}
                     >
                       {flexRender(
                         cell.column.columnDef.cell,
