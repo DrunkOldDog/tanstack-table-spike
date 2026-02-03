@@ -30,6 +30,7 @@ import {
   stateToRowKeys,
   type RowSelectionConfig,
 } from './selection-column'
+import { TableSkeleton } from './table-skeleton'
 
 type TableSearchParams = {
   sortBy?: string
@@ -55,6 +56,7 @@ type TablePageProps<T, F extends TableFiltersBase> = {
   renderFilterBar?: (filters: F) => React.ReactNode
   renderActiveFilters?: (filters: F) => React.ReactNode
   virtual?: boolean
+  sticky?: boolean
   pagination?: Omit<PaginationProps<T>, 'table'> & {
     defaultCurrent?: number
     defaultPageSize?: number
@@ -75,6 +77,7 @@ export function TablePage<T, F extends TableFiltersBase>({
   renderFilterBar,
   renderActiveFilters,
   virtual = false,
+  sticky = true,
   pagination: paginationProps,
   rowSelection: rowSelectionConfig,
   getRowId,
@@ -208,8 +211,14 @@ export function TablePage<T, F extends TableFiltersBase>({
 
   if (loading) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-gray-900">
-        <div className="text-xl text-gray-400">Loading data...</div>
+      <div className="min-h-screen bg-gray-900 p-6">
+        <div className="mx-auto max-w-6xl">
+          <div className="mb-4">
+            <h1 className="text-2xl font-bold text-white">{title}</h1>
+            <p className="text-sm text-gray-400">Loading...</p>
+          </div>
+          <TableSkeleton columns={columns.length} />
+        </div>
       </div>
     )
   }
@@ -264,7 +273,7 @@ export function TablePage<T, F extends TableFiltersBase>({
           <VirtualDataTable table={table} />
         ) : (
           <>
-            <DataTable table={table} />
+            <DataTable table={table} sticky={sticky} />
             <Pagination table={table} {...paginationProps} />
           </>
         )}

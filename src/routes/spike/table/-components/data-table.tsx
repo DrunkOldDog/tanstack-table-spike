@@ -1,40 +1,19 @@
-import type { CSSProperties } from 'react'
-import { flexRender, type Column, type Table } from '@tanstack/react-table'
+import { flexRender, type Table } from '@tanstack/react-table'
+import { getPinningStyles } from './table-utils'
 
 interface DataTableProps<T> {
   table: Table<T>
+  sticky?: boolean
 }
 
-/**
- * Get pinning styles for a column
- */
-function getPinningStyles<T>(column: Column<T, unknown>): CSSProperties {
-  const isPinned = column.getIsPinned()
-  const isLastLeftPinned =
-    isPinned === 'left' && column.getIsLastColumn('left')
-  const isFirstRightPinned =
-    isPinned === 'right' && column.getIsFirstColumn('right')
-
-  return {
-    boxShadow: isLastLeftPinned
-      ? '-4px 0 4px -4px gray inset'
-      : isFirstRightPinned
-        ? '4px 0 4px -4px gray inset'
-        : undefined,
-    left: isPinned === 'left' ? `${column.getStart('left')}px` : undefined,
-    right: isPinned === 'right' ? `${column.getAfter('right')}px` : undefined,
-    position: isPinned ? 'sticky' : 'relative',
-    width: column.getSize(),
-    zIndex: isPinned ? 1 : 0,
-  }
-}
-
-export function DataTable<T>({ table }: DataTableProps<T>) {
+export function DataTable<T>({ table, sticky = true }: DataTableProps<T>) {
   return (
     <div className="overflow-hidden rounded-lg border border-gray-700 bg-gray-800 shadow-xl">
       <div className="max-h-[70vh] overflow-auto">
         <table className="w-full">
-          <thead className="sticky top-0 z-10 bg-gray-700/95 backdrop-blur">
+          <thead
+            className={`${sticky ? 'sticky top-0' : ''} z-10 bg-gray-700/95 backdrop-blur`}
+          >
             {table.getHeaderGroups().map((headerGroup) => (
               <tr key={headerGroup.id}>
                 {headerGroup.headers.map((header) => {
