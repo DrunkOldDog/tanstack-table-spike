@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import {
   getCoreRowModel,
   getFilteredRowModel,
@@ -10,6 +10,7 @@ import {
   type ColumnPinningState,
   type FilterFn,
   type OnChangeFn,
+  type RowSelectionState,
   type SortingState,
   type VisibilityState,
 } from '@tanstack/react-table'
@@ -23,6 +24,12 @@ import { DataTable } from './data-table'
 import { VirtualDataTable } from './virtual-data-table'
 import { ColumnManager } from './column-manager'
 import { Pagination, type PaginationProps } from './pagination'
+import {
+  createSelectionColumn,
+  rowKeysToState,
+  stateToRowKeys,
+  type RowSelectionConfig,
+} from './selection-column'
 
 type TableSearchParams = {
   sortBy?: string
@@ -52,6 +59,8 @@ type TablePageProps<T, F extends TableFiltersBase> = {
     defaultCurrent?: number
     defaultPageSize?: number
   }
+  rowSelection?: RowSelectionConfig<T>
+  getRowId?: (row: T, index: number) => string
 }
 
 export function TablePage<T, F extends TableFiltersBase>({
@@ -67,17 +76,44 @@ export function TablePage<T, F extends TableFiltersBase>({
   renderActiveFilters,
   virtual = false,
   pagination: paginationProps,
+  rowSelection: rowSelectionConfig,
+  getRowId,
 }: TablePageProps<T, F>) {
   const [useVirtualization, setUseVirtualization] = useState(virtual)
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({})
+
+  // Row selection state - controlled via selectedRowKeys or internal
+  const isControlledSelection = rowSelectionConfig?.selectedRowKeys !== undefined
+  const [internalRowSelection, setInternalRowSelection] = useState<RowSelectionState>(
+    () => rowKeysToState(rowSelectionConfig?.selectedRowKeys ?? []),
+  )
+
+  // Sync internal state when controlled selectedRowKeys changes
+  useEffect(() => {
+    if (isControlledSelection) {
+      setInternalRowSelection(rowKeysToState(rowSelectionConfig.selectedRowKeys!))
+    }
+  }, [isControlledSelection, rowSelectionConfig?.selectedRowKeys])
+
+  // Build columns with selection column if enabled
+  const tableColumns = useMemo(() => {
+    if (!rowSelectionConfig) return columns
+    const selectionColumn = createSelectionColumn(rowSelectionConfig)
+    return [selectionColumn, ...columns]
+  }, [columns, rowSelectionConfig])
 
   // Initialize column pinning from column meta defaults
   const initialColumnPinning = useMemo<ColumnPinningState>(() => {
     const left: string[] = []
     const right: string[] = []
 
+    // Add selection column to pinned left if fixed
+    if (rowSelectionConfig?.fixed) {
+      left.push('__selection__')
+    }
+
     columns.forEach((col) => {
-      const accessorKey = 'accessorKey' in col ? (col.accessorKey as string) : undefined      
+      const accessorKey = 'accessorKey' in col ? (col.accessorKey as string) : undefined
       const id = accessorKey ?? col.id
       const defaultPinned = col.meta?.defaultPinned
       if (id && defaultPinned === 'left') {
@@ -88,7 +124,7 @@ export function TablePage<T, F extends TableFiltersBase>({
     })
 
     return { left, right }
-  }, [columns])
+  }, [columns, rowSelectionConfig?.fixed])
 
   const [columnPinning, setColumnPinning] =
     useState<ColumnPinningState>(initialColumnPinning)
@@ -108,15 +144,40 @@ export function TablePage<T, F extends TableFiltersBase>({
     setSearchParams({ sortBy: sortingStateToParam(newSorting) })
   }
 
+  const handleRowSelectionChange = (
+    updaterOrValue: RowSelectionState | ((prev: RowSelectionState) => RowSelectionState),
+  ) => {
+    const newSelection =
+      typeof updaterOrValue === 'function'
+        ? updaterOrValue(internalRowSelection)
+        : updaterOrValue
+
+    if (!isControlledSelection) {
+      setInternalRowSelection(newSelection)
+    }
+
+    // Call onChange callback with the new selection
+    if (rowSelectionConfig?.onChange) {
+      const selectedKeys = stateToRowKeys(newSelection)
+      const selectedRows = data.filter((_, index) => {
+        const rowId = getRowId ? getRowId(data[index], index) : String(index)
+        return newSelection[rowId]
+      })
+      rowSelectionConfig.onChange(selectedKeys, selectedRows)
+    }
+  }
+
   const table = useReactTable({
     data,
-    columns,
+    columns: tableColumns,
+    getRowId,
     state: {
       columnFilters: filters.columnFilters,
       globalFilter: filters.debouncedGlobalFilter,
       sorting,
       columnVisibility,
       columnPinning,
+      ...(rowSelectionConfig && { rowSelection: internalRowSelection }),
     },
     initialState: {
       pagination: {
@@ -129,6 +190,7 @@ export function TablePage<T, F extends TableFiltersBase>({
     onSortingChange: handleSortingChange,
     onColumnVisibilityChange: setColumnVisibility,
     onColumnPinningChange: setColumnPinning,
+    onRowSelectionChange: handleRowSelectionChange,
     getCoreRowModel: getCoreRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
     getSortedRowModel: getSortedRowModel(),
@@ -140,6 +202,8 @@ export function TablePage<T, F extends TableFiltersBase>({
     maxMultiSortColCount: 3,
     // Column pinning
     enableColumnPinning: true,
+    // Row selection
+    enableRowSelection: !!rowSelectionConfig,
   })
 
   if (loading) {
