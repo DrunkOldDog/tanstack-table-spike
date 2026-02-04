@@ -89,6 +89,7 @@ export function VirtualDataTable<T>({ table }: VirtualDataTableProps<T>) {
                 {row.getVisibleCells().map((cell) => {
                   const isPinned = cell.column.getIsPinned()
                   const align = cell.column.columnDef.meta?.align ?? 'left'
+                  const classNames = cell.column.columnDef.meta?.classNames
 
                   return (
                     <div
@@ -98,6 +99,7 @@ export function VirtualDataTable<T>({ table }: VirtualDataTableProps<T>) {
                         isPinned && 'bg-background',
                         align === 'center' && 'justify-center',
                         align === 'right' && 'justify-end',
+                        classNames,
                       )}
                       style={getPinningStyles(cell.column)}
                     >

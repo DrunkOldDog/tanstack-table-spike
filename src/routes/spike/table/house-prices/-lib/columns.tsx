@@ -25,6 +25,7 @@ export const columns = [
     enableGlobalFilter: false,
     meta: {
       align: 'center',
+      classNames: 'font-bold',
       group: 'Property Info',
       exportLabel: 'Property Price',
       defaultPinned: 'left',

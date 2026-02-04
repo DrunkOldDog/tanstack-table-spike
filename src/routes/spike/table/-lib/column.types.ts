@@ -7,6 +7,8 @@ import type { ReactNode } from 'react'
 export interface ExtendedColumnMeta {
   /** Alignment of the column */
   align?: 'left' | 'center' | 'right'
+  /** Class names for the column */
+  classNames?: string
   /** Logical group for organizing columns in the manager */
   group?: string
   /** Label to use when exporting (falls back to header) */

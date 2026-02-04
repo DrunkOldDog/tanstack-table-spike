@@ -72,6 +72,7 @@ export function DataTable<T>({ table, sticky = true }: DataTableProps<T>) {
                 {row.getVisibleCells().map((cell) => {
                   const isPinned = cell.column.getIsPinned()
                   const align = cell.column.columnDef.meta?.align ?? 'left'
+                  const classNames = cell.column.columnDef.meta?.classNames
 
                   return (
                     <TableCell
@@ -80,6 +81,7 @@ export function DataTable<T>({ table, sticky = true }: DataTableProps<T>) {
                         isPinned && 'bg-background',
                         align === 'center' && 'text-center',
                         align === 'right' && 'text-right',
+                        classNames,
                       )}
                       style={getPinningStyles(cell.column)}
                     >
