@@ -13,6 +13,7 @@ export const columns = [
     filterFn: priceRangeFilter,
     enableGlobalFilter: false,
     meta: {
+      align: 'center',
       group: 'Property Info',
       exportLabel: 'Property Price',
       defaultPinned: 'left',

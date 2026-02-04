@@ -23,17 +23,27 @@ export function DataTable<T>({ table, sticky = true }: DataTableProps<T>) {
           {table.getHeaderGroups().map((headerGroup) => (
             <TableRow key={headerGroup.id} className="hover:bg-transparent">
               {headerGroup.headers.map((header) => {
+                const align = header.column.columnDef.meta?.align ?? 'left'
+
                 return (
                   <TableHead
                     key={header.id}
                     className={cn(
                       'bg-background',
                       header.column.getCanSort() && 'cursor-pointer select-none',
+                      align === 'center' && 'text-center',
+                      align === 'right' && 'text-right',
                     )}
                     onClick={header.column.getToggleSortingHandler()}
                     style={getPinningStyles(header.column)}
                   >
-                    <div className="flex items-center gap-2">
+                    <div
+                      className={cn(
+                        'flex items-center gap-2',
+                        align === 'center' && 'justify-center',
+                        align === 'right' && 'justify-end',
+                      )}
+                    >
                       {flexRender(
                         header.column.columnDef.header,
                         header.getContext(),
@@ -61,11 +71,16 @@ export function DataTable<T>({ table, sticky = true }: DataTableProps<T>) {
               >
                 {row.getVisibleCells().map((cell) => {
                   const isPinned = cell.column.getIsPinned()
+                  const align = cell.column.columnDef.meta?.align ?? 'left'
 
                   return (
                     <TableCell
                       key={cell.id}
-                      className={cn(isPinned && 'bg-background')}
+                      className={cn(
+                        isPinned && 'bg-background',
+                        align === 'center' && 'text-center',
+                        align === 'right' && 'text-right',
+                      )}
                       style={getPinningStyles(cell.column)}
                     >
                       {flexRender(

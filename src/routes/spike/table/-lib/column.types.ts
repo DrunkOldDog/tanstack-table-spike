@@ -5,6 +5,8 @@ import type { ReactNode } from 'react'
  * Extended column metadata inspired by ETK's DataGridColumn
  */
 export interface ExtendedColumnMeta {
+  /** Alignment of the column */
+  align?: 'left' | 'center' | 'right'
   /** Logical group for organizing columns in the manager */
   group?: string
   /** Label to use when exporting (falls back to header) */
