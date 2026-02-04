@@ -211,11 +211,11 @@ export function TablePage<T, F extends TableFiltersBase>({
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-900 p-6">
+      <div className="min-h-screen bg-background p-6">
         <div className="mx-auto max-w-6xl">
           <div className="mb-4">
-            <h1 className="text-2xl font-bold text-white">{title}</h1>
-            <p className="text-sm text-gray-400">Loading...</p>
+            <h1 className="text-2xl font-bold">{title}</h1>
+            <p className="text-sm text-muted-foreground">Loading...</p>
           </div>
           <TableSkeleton columns={columns.length} />
         </div>
@@ -224,12 +224,12 @@ export function TablePage<T, F extends TableFiltersBase>({
   }
 
   return (
-    <div className="min-h-screen bg-gray-900 p-6">
+    <div className="min-h-screen bg-background p-6">
       <div className="mx-auto max-w-6xl">
         <div className="mb-4 flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-bold text-white">{title}</h1>
-            <p className="text-sm text-gray-400">
+            <h1 className="text-2xl font-bold">{title}</h1>
+            <p className="text-sm text-muted-foreground">
               {table.getFilteredRowModel().rows.length.toLocaleString()} of{' '}
               {data.length.toLocaleString()} records
             </p>

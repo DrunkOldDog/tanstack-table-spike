@@ -1,4 +1,6 @@
 import type { ColumnDef } from '@tanstack/react-table'
+import { Checkbox } from '@/components/ui/checkbox'
+import { cn } from '@/lib/utils'
 
 export type RowSelectionAlign = 'left' | 'center' | 'right'
 
@@ -43,17 +45,14 @@ export function createSelectionColumn<T>(
       }
 
       return (
-        <div className={alignClass[align]}>
-          <input
-            type="checkbox"
-            checked={table.getIsAllPageRowsSelected()}
-            ref={(el) => {
-              if (el) {
-                el.indeterminate = table.getIsSomePageRowsSelected()
-              }
-            }}
-            onChange={table.getToggleAllPageRowsSelectedHandler()}
-            className="h-4 w-4 cursor-pointer rounded border-gray-500 bg-gray-700 text-blue-600 focus:ring-blue-500 focus:ring-offset-gray-800"
+        <div className={cn('flex', alignClass[align])}>
+          <Checkbox
+            checked={
+              table.getIsAllPageRowsSelected() ||
+              (table.getIsSomePageRowsSelected() && 'indeterminate')
+            }
+            onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
+            aria-label="Select all"
           />
         </div>
       )
@@ -62,38 +61,31 @@ export function createSelectionColumn<T>(
       const checkboxProps = config.getCheckboxProps?.(row.original)
       const isDisabled = checkboxProps?.disabled ?? !row.getCanSelect()
 
-      const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const handler = row.getToggleSelectedHandler()
-        handler(e)
+      const handleCheckedChange = (checked: boolean) => {
+        row.toggleSelected(checked)
 
         if (config.onSelect) {
           const selectedRows = table
             .getSelectedRowModel()
             .rows.map((r: { original: T }) => r.original)
 
-          // After toggle, the selection state will be inverted
-          const willBeSelected = !row.getIsSelected()
-          const updatedSelectedRows = willBeSelected
+          const updatedSelectedRows = checked
             ? [...selectedRows, row.original]
             : selectedRows.filter((r: T) => r !== row.original)
 
-          config.onSelect(
-            row.original,
-            willBeSelected,
-            updatedSelectedRows,
-            e.nativeEvent,
-          )
+          // Create a synthetic event for compatibility
+          const syntheticEvent = new Event('change')
+          config.onSelect(row.original, checked, updatedSelectedRows, syntheticEvent)
         }
       }
 
       return (
-        <div className={alignClass[align]}>
-          <input
-            type="checkbox"
+        <div className={cn('flex', alignClass[align])}>
+          <Checkbox
             checked={row.getIsSelected()}
             disabled={isDisabled}
-            onChange={handleChange}
-            className="h-4 w-4 cursor-pointer rounded border-gray-500 bg-gray-700 text-blue-600 focus:ring-blue-500 focus:ring-offset-gray-800 disabled:cursor-not-allowed disabled:opacity-50"
+            onCheckedChange={handleCheckedChange}
+            aria-label="Select row"
           />
         </div>
       )

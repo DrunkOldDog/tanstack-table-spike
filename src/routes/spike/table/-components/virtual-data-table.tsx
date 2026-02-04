@@ -2,6 +2,7 @@ import { useRef } from 'react'
 import { flexRender, type Table } from '@tanstack/react-table'
 import { useVirtualizer } from '@tanstack/react-virtual'
 import { getPinningStyles } from './table-utils'
+import { cn } from '@/lib/utils'
 
 interface VirtualDataTableProps<T> {
   table: Table<T>
@@ -20,10 +21,10 @@ export function VirtualDataTable<T>({ table }: VirtualDataTableProps<T>) {
   })
 
   return (
-    <div className="overflow-hidden rounded-lg border border-gray-700 bg-gray-800 shadow-xl">
+    <div className="overflow-hidden rounded-md border">
       <div ref={tableContainerRef} className="max-h-[70vh] overflow-auto">
         {/* Header - uses flex to match body layout */}
-        <div className="sticky top-0 z-10 flex w-full bg-gray-700/95 backdrop-blur">
+        <div className="sticky top-0 z-20 flex w-full bg-background border-b">
           {table.getHeaderGroups().map((headerGroup) =>
             headerGroup.headers.map((header) => {
               const isPinned = header.column.getIsPinned()
@@ -31,8 +32,12 @@ export function VirtualDataTable<T>({ table }: VirtualDataTableProps<T>) {
               return (
                 <div
                   key={header.id}
-                  className={`px-6 py-4 text-left text-sm font-semibold uppercase tracking-wider text-gray-300 ${header.column.getCanSort() ? 'cursor-pointer select-none hover:text-white' : ''} ${isPinned ? 'bg-gray-700' : ''}`}
-                  style={getPinningStyles(header.column, { flex: true })}
+                  className={cn(
+                    'h-10 px-2 text-left text-sm font-medium text-foreground flex items-center',
+                    header.column.getCanSort() && 'cursor-pointer select-none',
+                    isPinned && 'bg-background z-10',
+                  )}
+                  style={getPinningStyles(header.column)}
                   onClick={header.column.getToggleSortingHandler()}
                 >
                   <div className="flex items-center gap-2">
@@ -41,19 +46,11 @@ export function VirtualDataTable<T>({ table }: VirtualDataTableProps<T>) {
                       header.getContext(),
                     )}
                     {{
-                      asc: (
-                        <span className="flex items-center text-blue-400">
-                          ↑
-                        </span>
-                      ),
-                      desc: (
-                        <span className="flex items-center text-blue-400">
-                          ↓
-                        </span>
-                      ),
+                      asc: <span className="text-primary">↑</span>,
+                      desc: <span className="text-primary">↓</span>,
                     }[header.column.getIsSorted() as string] ??
                       (header.column.getCanSort() ? (
-                        <span className="text-gray-600">↕</span>
+                        <span className="text-muted-foreground">↕</span>
                       ) : null)}
                   </div>
                 </div>
@@ -75,6 +72,7 @@ export function VirtualDataTable<T>({ table }: VirtualDataTableProps<T>) {
               <div
                 key={row.id}
                 data-index={virtualRow.index}
+                data-state={row.getIsSelected() && 'selected'}
                 ref={(node) => rowVirtualizer.measureElement(node)}
                 style={{
                   position: 'absolute',
@@ -83,7 +81,7 @@ export function VirtualDataTable<T>({ table }: VirtualDataTableProps<T>) {
                   width: '100%',
                   transform: `translateY(${virtualRow.start}px)`,
                 }}
-                className="flex border-b border-gray-700 transition-colors hover:bg-gray-700/30"
+                className="flex border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted"
               >
                 {row.getVisibleCells().map((cell) => {
                   const isPinned = cell.column.getIsPinned()
@@ -91,8 +89,11 @@ export function VirtualDataTable<T>({ table }: VirtualDataTableProps<T>) {
                   return (
                     <div
                       key={cell.id}
-                      className={`px-6 py-4 text-sm text-gray-200 ${isPinned ? 'bg-gray-800' : ''}`}
-                      style={getPinningStyles(cell.column, { flex: true })}
+                      className={cn(
+                        'p-2 text-sm flex items-center',
+                        isPinned && 'bg-background',
+                      )}
+                      style={getPinningStyles(cell.column)}
                     >
                       {flexRender(
                         cell.column.columnDef.cell,
