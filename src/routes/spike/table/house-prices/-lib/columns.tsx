@@ -1,12 +1,23 @@
 import { createColumnHelper } from '@tanstack/react-table'
 import type { HouseData } from './types'
 import { priceRangeFilter, areaRangeFilter, exactMatchFilter } from './filters'
+import { OwnerCell } from '../-components/owner-cell'
 // Import to ensure module augmentation is applied
 import '../../-lib/column.types'
 
 const columnHelper = createColumnHelper<HouseData>()
 
 export const columns = [
+  columnHelper.accessor('houseOwner', {
+    header: 'Owner',
+    cell: (info) => <OwnerCell owner={info.getValue()} />,
+    enableSorting: false,
+    size: 200,
+    meta: {
+      group: 'Owner',
+      exportLabel: 'House Owner',
+    },
+  }),
   columnHelper.accessor('price', {
     header: 'Price',
     cell: (info) => `₹${info.getValue().toLocaleString()}`,
