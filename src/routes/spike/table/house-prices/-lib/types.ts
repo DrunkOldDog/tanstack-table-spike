@@ -1,3 +1,10 @@
+export type HouseOwner = {
+  userId: string
+  firstName: string
+  lastName: string
+  email: string
+}
+
 export type HouseData = {
   price: number
   area: number
@@ -12,4 +19,5 @@ export type HouseData = {
   parking: number
   prefarea: boolean
   furnishingstatus: string
+  houseOwner: HouseOwner
 }

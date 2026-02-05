@@ -5,6 +5,10 @@ import type { ReactNode } from 'react'
  * Extended column metadata inspired by ETK's DataGridColumn
  */
 export interface ExtendedColumnMeta {
+  /** Alignment of the column */
+  align?: 'left' | 'center' | 'right'
+  /** Class names for the column */
+  classNames?: string
   /** Logical group for organizing columns in the manager */
   group?: string
   /** Label to use when exporting (falls back to header) */
@@ -19,6 +23,8 @@ export interface ExtendedColumnMeta {
   defaultHidden?: boolean
   /** Default pin position */
   defaultPinned?: 'left' | 'right' | false
+  /** Default sort direction for this column */
+  defaultSort?: 'asc' | 'desc'
 }
 
 /**

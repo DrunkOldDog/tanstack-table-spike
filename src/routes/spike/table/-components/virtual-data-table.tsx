@@ -28,14 +28,17 @@ export function VirtualDataTable<T>({ table }: VirtualDataTableProps<T>) {
           {table.getHeaderGroups().map((headerGroup) =>
             headerGroup.headers.map((header) => {
               const isPinned = header.column.getIsPinned()
+              const align = header.column.columnDef.meta?.align ?? 'left'
 
               return (
                 <div
                   key={header.id}
                   className={cn(
-                    'h-10 px-2 text-left text-sm font-medium text-foreground flex items-center',
+                    'h-10 px-2 text-sm font-medium text-foreground flex items-center',
                     header.column.getCanSort() && 'cursor-pointer select-none',
                     isPinned && 'bg-background z-10',
+                    align === 'center' && 'justify-center',
+                    align === 'right' && 'justify-end',
                   )}
                   style={getPinningStyles(header.column)}
                   onClick={header.column.getToggleSortingHandler()}
@@ -85,6 +88,8 @@ export function VirtualDataTable<T>({ table }: VirtualDataTableProps<T>) {
               >
                 {row.getVisibleCells().map((cell) => {
                   const isPinned = cell.column.getIsPinned()
+                  const align = cell.column.columnDef.meta?.align ?? 'left'
+                  const classNames = cell.column.columnDef.meta?.classNames
 
                   return (
                     <div
@@ -92,6 +97,9 @@ export function VirtualDataTable<T>({ table }: VirtualDataTableProps<T>) {
                       className={cn(
                         'p-2 text-sm flex items-center',
                         isPinned && 'bg-background',
+                        align === 'center' && 'justify-center',
+                        align === 'right' && 'justify-end',
+                        classNames,
                       )}
                       style={getPinningStyles(cell.column)}
                     >
