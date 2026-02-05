@@ -29,6 +29,7 @@ export const columns = [
       group: 'Property Info',
       exportLabel: 'Property Price',
       defaultPinned: 'left',
+      defaultSort: 'desc'
     },
   }),
   columnHelper.accessor('area', {
@@ -39,6 +40,7 @@ export const columns = [
     meta: {
       group: 'Property Info',
       exportLabel: 'Area in Square Feet',
+      defaultSort: 'asc'
     },
   }),
   columnHelper.accessor('bedrooms', {

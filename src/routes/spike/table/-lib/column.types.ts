@@ -23,6 +23,8 @@ export interface ExtendedColumnMeta {
   defaultHidden?: boolean
   /** Default pin position */
   defaultPinned?: 'left' | 'right' | false
+  /** Default sort direction for this column */
+  defaultSort?: 'asc' | 'desc'
 }
 
 /**

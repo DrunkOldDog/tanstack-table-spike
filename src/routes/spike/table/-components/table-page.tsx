@@ -132,6 +132,27 @@ export function TablePage<T, F extends TableFiltersBase>({
   const [columnPinning, setColumnPinning] =
     useState<ColumnPinningState>(initialColumnPinning)
 
+  // Derive default sorting from column meta
+  const defaultSorting = useMemo<SortingState>(() => {
+    const sorting: SortingState = []
+    columns.forEach((col) => {
+      const accessorKey = 'accessorKey' in col ? (col.accessorKey as string) : undefined
+      const id = accessorKey ?? col.id
+      const defaultSort = col.meta?.defaultSort
+      if (id && defaultSort) {
+        sorting.push({ id, desc: defaultSort === 'desc' })
+      }
+    })
+    return sorting
+  }, [columns])
+
+  // Apply default sorting to URL on first render if no sortBy param exists
+  useEffect(() => {
+    if (!searchParams.sortBy && defaultSorting.length > 0) {
+      setSearchParams({ sortBy: sortingStateToParam(defaultSorting) })
+    }
+  }, []) // eslint-disable-line react-hooks/exhaustive-deps
+
   const sorting = useMemo<SortingState>(
     () => sortingParamToState(searchParams.sortBy),
     [searchParams.sortBy],
