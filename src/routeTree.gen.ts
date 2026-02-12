@@ -10,13 +10,16 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as TestAuthHeaderRouteImport } from './routes/test/auth-header'
 import { Route as DemoTanstackQueryRouteImport } from './routes/demo/tanstack-query'
 import { Route as DemoTableRouteImport } from './routes/demo/table'
-import { Route as SpikeTableIndexRouteImport } from './routes/spike/table/index'
+import { Route as SpikeTableRouteRouteImport } from './routes/spike/table/route'
+import { Route as AuthLoginIndexRouteImport } from './routes/auth/login/index'
 import { Route as DemoStartServerFuncsRouteImport } from './routes/demo/start.server-funcs'
 import { Route as DemoStartApiRequestRouteImport } from './routes/demo/start.api-request'
 import { Route as DemoApiTqTodosRouteImport } from './routes/demo/api.tq-todos'
 import { Route as DemoApiNamesRouteImport } from './routes/demo/api.names'
+import { Route as ApiAuthCallbackRouteImport } from './routes/api/auth/callback'
 import { Route as SpikeTableHousePricesIndexRouteImport } from './routes/spike/table/house-prices/index'
 import { Route as SpikeTableDailyEtfIndexRouteImport } from './routes/spike/table/daily-etf/index'
 import { Route as DemoStartSsrIndexRouteImport } from './routes/demo/start.ssr.index'
@@ -29,6 +32,11 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const TestAuthHeaderRoute = TestAuthHeaderRouteImport.update({
+  id: '/test/auth-header',
+  path: '/test/auth-header',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const DemoTanstackQueryRoute = DemoTanstackQueryRouteImport.update({
   id: '/demo/tanstack-query',
   path: '/demo/tanstack-query',
@@ -39,9 +47,14 @@ const DemoTableRoute = DemoTableRouteImport.update({
   path: '/demo/table',
   getParentRoute: () => rootRouteImport,
 } as any)
-const SpikeTableIndexRoute = SpikeTableIndexRouteImport.update({
-  id: '/spike/table/',
-  path: '/spike/table/',
+const SpikeTableRouteRoute = SpikeTableRouteRouteImport.update({
+  id: '/spike/table',
+  path: '/spike/table',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthLoginIndexRoute = AuthLoginIndexRouteImport.update({
+  id: '/auth/login/',
+  path: '/auth/login/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const DemoStartServerFuncsRoute = DemoStartServerFuncsRouteImport.update({
@@ -64,16 +77,21 @@ const DemoApiNamesRoute = DemoApiNamesRouteImport.update({
   path: '/demo/api/names',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiAuthCallbackRoute = ApiAuthCallbackRouteImport.update({
+  id: '/api/auth/callback',
+  path: '/api/auth/callback',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const SpikeTableHousePricesIndexRoute =
   SpikeTableHousePricesIndexRouteImport.update({
-    id: '/spike/table/house-prices/',
-    path: '/spike/table/house-prices/',
-    getParentRoute: () => rootRouteImport,
+    id: '/house-prices/',
+    path: '/house-prices/',
+    getParentRoute: () => SpikeTableRouteRoute,
   } as any)
 const SpikeTableDailyEtfIndexRoute = SpikeTableDailyEtfIndexRouteImport.update({
-  id: '/spike/table/daily-etf/',
-  path: '/spike/table/daily-etf/',
-  getParentRoute: () => rootRouteImport,
+  id: '/daily-etf/',
+  path: '/daily-etf/',
+  getParentRoute: () => SpikeTableRouteRoute,
 } as any)
 const DemoStartSsrIndexRoute = DemoStartSsrIndexRouteImport.update({
   id: '/demo/start/ssr/',
@@ -98,13 +116,16 @@ const DemoStartSsrDataOnlyRoute = DemoStartSsrDataOnlyRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/spike/table': typeof SpikeTableRouteRouteWithChildren
   '/demo/table': typeof DemoTableRoute
   '/demo/tanstack-query': typeof DemoTanstackQueryRoute
+  '/test/auth-header': typeof TestAuthHeaderRoute
+  '/api/auth/callback': typeof ApiAuthCallbackRoute
   '/demo/api/names': typeof DemoApiNamesRoute
   '/demo/api/tq-todos': typeof DemoApiTqTodosRoute
   '/demo/start/api-request': typeof DemoStartApiRequestRoute
   '/demo/start/server-funcs': typeof DemoStartServerFuncsRoute
-  '/spike/table/': typeof SpikeTableIndexRoute
+  '/auth/login/': typeof AuthLoginIndexRoute
   '/demo/start/ssr/data-only': typeof DemoStartSsrDataOnlyRoute
   '/demo/start/ssr/full-ssr': typeof DemoStartSsrFullSsrRoute
   '/demo/start/ssr/spa-mode': typeof DemoStartSsrSpaModeRoute
@@ -114,13 +135,16 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/spike/table': typeof SpikeTableRouteRouteWithChildren
   '/demo/table': typeof DemoTableRoute
   '/demo/tanstack-query': typeof DemoTanstackQueryRoute
+  '/test/auth-header': typeof TestAuthHeaderRoute
+  '/api/auth/callback': typeof ApiAuthCallbackRoute
   '/demo/api/names': typeof DemoApiNamesRoute
   '/demo/api/tq-todos': typeof DemoApiTqTodosRoute
   '/demo/start/api-request': typeof DemoStartApiRequestRoute
   '/demo/start/server-funcs': typeof DemoStartServerFuncsRoute
-  '/spike/table': typeof SpikeTableIndexRoute
+  '/auth/login': typeof AuthLoginIndexRoute
   '/demo/start/ssr/data-only': typeof DemoStartSsrDataOnlyRoute
   '/demo/start/ssr/full-ssr': typeof DemoStartSsrFullSsrRoute
   '/demo/start/ssr/spa-mode': typeof DemoStartSsrSpaModeRoute
@@ -131,13 +155,16 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/spike/table': typeof SpikeTableRouteRouteWithChildren
   '/demo/table': typeof DemoTableRoute
   '/demo/tanstack-query': typeof DemoTanstackQueryRoute
+  '/test/auth-header': typeof TestAuthHeaderRoute
+  '/api/auth/callback': typeof ApiAuthCallbackRoute
   '/demo/api/names': typeof DemoApiNamesRoute
   '/demo/api/tq-todos': typeof DemoApiTqTodosRoute
   '/demo/start/api-request': typeof DemoStartApiRequestRoute
   '/demo/start/server-funcs': typeof DemoStartServerFuncsRoute
-  '/spike/table/': typeof SpikeTableIndexRoute
+  '/auth/login/': typeof AuthLoginIndexRoute
   '/demo/start/ssr/data-only': typeof DemoStartSsrDataOnlyRoute
   '/demo/start/ssr/full-ssr': typeof DemoStartSsrFullSsrRoute
   '/demo/start/ssr/spa-mode': typeof DemoStartSsrSpaModeRoute
@@ -149,13 +176,16 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/spike/table'
     | '/demo/table'
     | '/demo/tanstack-query'
+    | '/test/auth-header'
+    | '/api/auth/callback'
     | '/demo/api/names'
     | '/demo/api/tq-todos'
     | '/demo/start/api-request'
     | '/demo/start/server-funcs'
-    | '/spike/table/'
+    | '/auth/login/'
     | '/demo/start/ssr/data-only'
     | '/demo/start/ssr/full-ssr'
     | '/demo/start/ssr/spa-mode'
@@ -165,13 +195,16 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/spike/table'
     | '/demo/table'
     | '/demo/tanstack-query'
+    | '/test/auth-header'
+    | '/api/auth/callback'
     | '/demo/api/names'
     | '/demo/api/tq-todos'
     | '/demo/start/api-request'
     | '/demo/start/server-funcs'
-    | '/spike/table'
+    | '/auth/login'
     | '/demo/start/ssr/data-only'
     | '/demo/start/ssr/full-ssr'
     | '/demo/start/ssr/spa-mode'
@@ -181,13 +214,16 @@ export interface FileRouteTypes {
   id:
     | '__root__'
     | '/'
+    | '/spike/table'
     | '/demo/table'
     | '/demo/tanstack-query'
+    | '/test/auth-header'
+    | '/api/auth/callback'
     | '/demo/api/names'
     | '/demo/api/tq-todos'
     | '/demo/start/api-request'
     | '/demo/start/server-funcs'
-    | '/spike/table/'
+    | '/auth/login/'
     | '/demo/start/ssr/data-only'
     | '/demo/start/ssr/full-ssr'
     | '/demo/start/ssr/spa-mode'
@@ -198,19 +234,20 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  SpikeTableRouteRoute: typeof SpikeTableRouteRouteWithChildren
   DemoTableRoute: typeof DemoTableRoute
   DemoTanstackQueryRoute: typeof DemoTanstackQueryRoute
+  TestAuthHeaderRoute: typeof TestAuthHeaderRoute
+  ApiAuthCallbackRoute: typeof ApiAuthCallbackRoute
   DemoApiNamesRoute: typeof DemoApiNamesRoute
   DemoApiTqTodosRoute: typeof DemoApiTqTodosRoute
   DemoStartApiRequestRoute: typeof DemoStartApiRequestRoute
   DemoStartServerFuncsRoute: typeof DemoStartServerFuncsRoute
-  SpikeTableIndexRoute: typeof SpikeTableIndexRoute
+  AuthLoginIndexRoute: typeof AuthLoginIndexRoute
   DemoStartSsrDataOnlyRoute: typeof DemoStartSsrDataOnlyRoute
   DemoStartSsrFullSsrRoute: typeof DemoStartSsrFullSsrRoute
   DemoStartSsrSpaModeRoute: typeof DemoStartSsrSpaModeRoute
   DemoStartSsrIndexRoute: typeof DemoStartSsrIndexRoute
-  SpikeTableDailyEtfIndexRoute: typeof SpikeTableDailyEtfIndexRoute
-  SpikeTableHousePricesIndexRoute: typeof SpikeTableHousePricesIndexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -220,6 +257,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/test/auth-header': {
+      id: '/test/auth-header'
+      path: '/test/auth-header'
+      fullPath: '/test/auth-header'
+      preLoaderRoute: typeof TestAuthHeaderRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/demo/tanstack-query': {
@@ -236,11 +280,18 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DemoTableRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/spike/table/': {
-      id: '/spike/table/'
+    '/spike/table': {
+      id: '/spike/table'
       path: '/spike/table'
-      fullPath: '/spike/table/'
-      preLoaderRoute: typeof SpikeTableIndexRouteImport
+      fullPath: '/spike/table'
+      preLoaderRoute: typeof SpikeTableRouteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/auth/login/': {
+      id: '/auth/login/'
+      path: '/auth/login'
+      fullPath: '/auth/login/'
+      preLoaderRoute: typeof AuthLoginIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/demo/start/server-funcs': {
@@ -271,19 +322,26 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DemoApiNamesRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/auth/callback': {
+      id: '/api/auth/callback'
+      path: '/api/auth/callback'
+      fullPath: '/api/auth/callback'
+      preLoaderRoute: typeof ApiAuthCallbackRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/spike/table/house-prices/': {
       id: '/spike/table/house-prices/'
-      path: '/spike/table/house-prices'
+      path: '/house-prices'
       fullPath: '/spike/table/house-prices/'
       preLoaderRoute: typeof SpikeTableHousePricesIndexRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof SpikeTableRouteRoute
     }
     '/spike/table/daily-etf/': {
       id: '/spike/table/daily-etf/'
-      path: '/spike/table/daily-etf'
+      path: '/daily-etf'
       fullPath: '/spike/table/daily-etf/'
       preLoaderRoute: typeof SpikeTableDailyEtfIndexRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof SpikeTableRouteRoute
     }
     '/demo/start/ssr/': {
       id: '/demo/start/ssr/'
@@ -316,31 +374,47 @@ declare module '@tanstack/react-router' {
   }
 }
 
+interface SpikeTableRouteRouteChildren {
+  SpikeTableDailyEtfIndexRoute: typeof SpikeTableDailyEtfIndexRoute
+  SpikeTableHousePricesIndexRoute: typeof SpikeTableHousePricesIndexRoute
+}
+
+const SpikeTableRouteRouteChildren: SpikeTableRouteRouteChildren = {
+  SpikeTableDailyEtfIndexRoute: SpikeTableDailyEtfIndexRoute,
+  SpikeTableHousePricesIndexRoute: SpikeTableHousePricesIndexRoute,
+}
+
+const SpikeTableRouteRouteWithChildren = SpikeTableRouteRoute._addFileChildren(
+  SpikeTableRouteRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  SpikeTableRouteRoute: SpikeTableRouteRouteWithChildren,
   DemoTableRoute: DemoTableRoute,
   DemoTanstackQueryRoute: DemoTanstackQueryRoute,
+  TestAuthHeaderRoute: TestAuthHeaderRoute,
+  ApiAuthCallbackRoute: ApiAuthCallbackRoute,
   DemoApiNamesRoute: DemoApiNamesRoute,
   DemoApiTqTodosRoute: DemoApiTqTodosRoute,
   DemoStartApiRequestRoute: DemoStartApiRequestRoute,
   DemoStartServerFuncsRoute: DemoStartServerFuncsRoute,
-  SpikeTableIndexRoute: SpikeTableIndexRoute,
+  AuthLoginIndexRoute: AuthLoginIndexRoute,
   DemoStartSsrDataOnlyRoute: DemoStartSsrDataOnlyRoute,
   DemoStartSsrFullSsrRoute: DemoStartSsrFullSsrRoute,
   DemoStartSsrSpaModeRoute: DemoStartSsrSpaModeRoute,
   DemoStartSsrIndexRoute: DemoStartSsrIndexRoute,
-  SpikeTableDailyEtfIndexRoute: SpikeTableDailyEtfIndexRoute,
-  SpikeTableHousePricesIndexRoute: SpikeTableHousePricesIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
 
 import type { getRouter } from './router.tsx'
-import type { createStart } from '@tanstack/react-start'
+import type { startInstance } from './start.ts'
 declare module '@tanstack/react-start' {
   interface Register {
     ssr: true
     router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
   }
 }

@@ -1,0 +1,19 @@
+import { createFileRoute, redirect } from '@tanstack/react-router'
+import { getAuth, getSignInUrl } from '@workos/authkit-tanstack-react-start';
+
+export const Route = createFileRoute('/spike/table')({
+  beforeLoad: async ({ location }) => {
+    const { user } = await getAuth();
+
+    if (!user) {
+      const signInUrl = await getSignInUrl({
+        data: { returnPathname: location.pathname },
+      });
+      throw redirect({ href: signInUrl });
+    }
+
+    throw Route.redirect({
+      to: './daily-etf',
+    })
+  },
+})
